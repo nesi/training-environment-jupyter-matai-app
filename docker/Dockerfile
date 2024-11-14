@@ -78,7 +78,7 @@ RUN git clone https://github.com/MRtrix3/mrtrix3.git
 # Configure and build MRtrix3 without GUI
 WORKDIR /opt/mrtrix3
 RUN ./configure -nogui && \
-    NUMBER_OF_PROCESSORS=$(nproc) ./build
+    ./build
 
 # Add MRtrix3 to PATH
 ENV PATH="/opt/mrtrix3/bin:${PATH}"
