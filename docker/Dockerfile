@@ -86,7 +86,7 @@ ENV PATH="/opt/mrtrix3/bin:${PATH}"
 
 RUN wget -nv https://github.com/nesi/training-environment-jupyter-matai-app/releases/download/v0.1.0/data.zip \
         -O /var/lib/data.zip \
-    && unzip /var/lib/data.zip -C /var/lib \
+    && unzip /var/lib/data.zip -d /var/lib \
     && rm -f /var/lib/data.zip \
     && chown -R root:root /var/lib/data \
     && chmod -R o+rX /var/lib/data
