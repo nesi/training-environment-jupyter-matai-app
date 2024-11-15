@@ -1,8 +1,7 @@
 FROM ubuntu:22.04
 
-ENV FSLDIR          "/usr/local/fsl"
-ENV DEBIAN_FRONTEND "noninteractive"
-ENV LANG en_NZ.utf8
+ENV DEBIAN_FRONTEND="noninteractive"
+ENV LANG=en_NZ.utf8
 
 # Forked from ML102
 # - replace urls and difrectories
@@ -39,23 +38,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
         libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-
-RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py && \
-    python ./fslinstaller.py -d /usr/local/fsl/
-
-ENTRYPOINT [ "sh", "-c", ". /usr/local/fsl/etc/fslconf/fsl.sh && /bin/bash" ]
-
-# install jupyterlab
-RUN pip3 --no-cache-dir install jupyterlab
-RUN pip3 --no-cache-dir install numpy
-RUN pip3 --no-cache-dir install scipy
-RUN pip3 --no-cache-dir install pandas
-RUN pip3 --no-cache-dir install matplotlib
-RUN pip3 --no-cache-dir install nilearn
-RUN pip3 --no-cache-dir install mne
-
-
-
 ## install mrtrix3 requirements
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \ 
     libeigen3-dev \
@@ -69,7 +51,37 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libssl-dev \
     cmake \
     ninja-build \
+    # X11 dependencies for FSL
+    libx11-6 \
+    libxext6 \
+    libxt6 \
+    libxmu6 \
+    libxft2 \
+    libxinerama1 \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
+# install jupyterlab
+RUN pip3 --no-cache-dir install jupyterlab
+RUN pip3 --no-cache-dir install numpy
+RUN pip3 --no-cache-dir install scipy
+RUN pip3 --no-cache-dir install pandas
+RUN pip3 --no-cache-dir install matplotlib
+RUN pip3 --no-cache-dir install nilearn
+RUN pip3 --no-cache-dir install mne
+
+
+#Install FSl
+RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py && \
+    python ./fslinstaller.py -d /usr/local/fsl/
+
+#Make FSL Happy
+ENV FSLDIR=/usr/local/fsl
+ENV PATH=$FSLDIR/bin:$PATH
+RUN /bin/bash -c 'source /usr/local/fsl/etc/fslconf/fsl.sh'
+
+ENV FSLMULTIFILEQUIT=TRUE
+ENV FSLOUTPUTTYPE=NIFTI_GZ
 
 # Clone MRtrix3 repository
 WORKDIR /opt
