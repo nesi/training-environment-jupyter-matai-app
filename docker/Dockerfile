@@ -78,7 +78,12 @@ RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.
 #Make FSL Happy
 ENV FSLDIR=/usr/local/fsl
 ENV PATH=$FSLDIR/bin:$PATH
-RUN /bin/bash -c 'source /usr/local/fsl/etc/fslconf/fsl.sh'
+
+#Following is the recommended process in upstream repo to source the file. However, this only works during Dockerb build and doesn't persist during runtime
+#RUN /bin/bash -c 'source /usr/local/fsl/etc/fslconf/fsl.sh'
+#Therefore, using the following methong which will add FSL setup to system-wide profile
+RUN echo '. ${FSLDIR}/etc/fslconf/fsl.sh' >> /etc/profile.d/fsl.sh
+
 
 ENV FSLMULTIFILEQUIT=TRUE
 ENV FSLOUTPUTTYPE=NIFTI_GZ

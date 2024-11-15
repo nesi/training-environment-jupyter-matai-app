@@ -17,7 +17,7 @@ script:
   native:
     container:
       name: "matai"
-      image: "ghcr.io/nesi/training-environment-jupyter-matai-app:v0.7.0"
+      image: "ghcr.io/nesi/training-environment-jupyter-matai-app:v0.8.0"
       command: ["/bin/bash","-l","<%= staged_root %>/job_script_content.sh"]
       working_dir: "<%= Etc.getpwnam(ENV['USER']).dir %>"
       restart_policy: 'OnFailure'
