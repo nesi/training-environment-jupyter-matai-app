@@ -36,6 +36,13 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
         libgtk2.0-0 \
         firefox \
         libgomp1 \
+        # Scientific computing dependencies
+        libatlas-base-dev \
+        gfortran \
+        libhdf5-dev \
+        libblas-dev \
+        liblapack-dev \
+        libfreetype6-dev \
     && rm -rf /var/lib/apt/lists/*
 
 ## install mrtrix3 requirements
@@ -61,15 +68,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# install jupyterlab
-RUN pip3 --no-cache-dir install jupyterlab
-RUN pip3 --no-cache-dir install numpy
-RUN pip3 --no-cache-dir install scipy
-RUN pip3 --no-cache-dir install pandas
-RUN pip3 --no-cache-dir install matplotlib
-RUN pip3 --no-cache-dir install nilearn
-RUN pip3 --no-cache-dir install mne
-
 
 #Install FSl
 RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py && \
@@ -87,6 +85,18 @@ RUN echo '. ${FSLDIR}/etc/fslconf/fsl.sh' >> /etc/profile.d/fsl.sh
 
 ENV FSLMULTIFILEQUIT=TRUE
 ENV FSLOUTPUTTYPE=NIFTI_GZ
+
+# Install additional packages into FSL's conda environment
+RUN . ${FSLDIR}/etc/fslconf/fsl.sh && \
+    ${FSLDIR}/bin/conda install -y -c conda-forge \
+    jupyterlab \
+    numpy \
+    scipy \
+    pandas \
+    matplotlib \
+    nilearn \
+    mne
+
 
 # Clone MRtrix3 repository
 WORKDIR /opt
@@ -107,3 +117,10 @@ RUN wget -nv https://github.com/nesi/training-environment-jupyter-matai-app/rele
     && rm -f /var/lib/data.zip \
     && chown -R root:root /var/lib/data \
     && chmod -R o+rX /var/lib/data
+
+
+
+# Verify installations: This is more of a sanity check as there were previous tags didn't 
+# have these two packages correctly installed yet the container build didn't fail
+RUN python3 -c "import nilearn; import mne" || exit 1
+
