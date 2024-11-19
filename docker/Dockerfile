@@ -97,6 +97,10 @@ RUN . ${FSLDIR}/etc/fslconf/fsl.sh && \
     nilearn \
     mne
 
+RUN . ${FSLDIR}/etc/fslconf/fsl.sh && \
+    git clone https://github.com/MIC-DKFZ/HD-BET && \
+    cd HD-BET && \
+    pip install -e .
 
 # Clone MRtrix3 repository
 WORKDIR /opt
@@ -111,7 +115,7 @@ RUN ./configure -nogui && \
 ENV PATH="/opt/mrtrix3/bin:${PATH}"
 
 
-RUN wget -nv "https://filesender.reannz.co.nz/download.php?token=624deb75-7c1e-4c96-ad9f-826e65e89630&files_ids=24775" \
+RUN wget -nv https://github.com/nesi/training-environment-jupyter-matai-app/releases/download/v0.1.0/data.zip \
         -O /var/lib/data.zip \
     && unzip /var/lib/data.zip -d /var/lib \
     && rm -f /var/lib/data.zip \
@@ -120,7 +124,6 @@ RUN wget -nv "https://filesender.reannz.co.nz/download.php?token=624deb75-7c1e-4
 
 
 
-# Verify installations: This is more of a sanity check as there were previous tags didn't 
-# have these two packages correctly installed yet the container build didn't fail
+# Verify installations
 RUN python3 -c "import nilearn; import mne" || exit 1
 
