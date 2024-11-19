@@ -100,6 +100,9 @@ RUN . ${FSLDIR}/etc/fslconf/fsl.sh && \
 RUN . ${FSLDIR}/etc/fslconf/fsl.sh && \
     git clone https://github.com/MIC-DKFZ/HD-BET && \
     cd HD-BET && \
+    sed -i '/torch>=/d' pyproject.toml && \
+    sed -i '/torch>=/d' requirements.txt && \
+    pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu && \
     pip install -e .
 
 # Clone MRtrix3 repository
